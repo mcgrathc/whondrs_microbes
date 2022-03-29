@@ -31,17 +31,11 @@ mol <- read.csv(mol_file)
 names(data)[1] <- "Mass"
 
 mol_subset <- mol %>% select(Mass, MolForm)
-
-data$Mass <- round(data$Mass ,digit=6)
-mol$Mass <- round(mol$Mass ,digit=6)
-
 ```
 
 ```{r}
 #Make first column rownames
-
-
-jointdataset <- merge(data, mol_subset, by = 'Mass')
+jointdataset <- merge(data, mol_subset, by= 0)
 ```
 
 
