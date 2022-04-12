@@ -3,7 +3,7 @@ library(tidyverse)
 library(dplyr)
 
 #Set the working directory 
-setwd('C:/Users/mcgr323/projects/whondrs_microbes/whondrs_microbes/')
+setwd('C:/Users/mcgr323/projects/whondrs_microbes/')
 
 #Load WHONDRS S19S data (presence/absence)
 data <- read.csv('Processed_Clean_S19S_Water_Field_sediments_9-29_Data.csv')
