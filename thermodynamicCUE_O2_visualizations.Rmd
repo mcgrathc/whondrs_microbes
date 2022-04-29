@@ -1,0 +1,132 @@
+---
+title: "thermodynamicCUE_O2_visualzations"
+author: "Casey McGrath"
+date: "4/22/2022"
+output: html_document
+---
+```{r libraries}
+#Load needed libraries 
+library(tidyr)
+library(stringr)
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(corrplot)
+library(naniar)
+```
+
+#Load data and merge to metadata
+```{r data}
+setwd('C:\\Users\\mcgr323\\projects\\whondrs_microbes\\')
+
+#Load datasets
+df <- read_csv("water_sites_oxy.csv")
+metadata <- read_csv("whondrs_metadata.csv")
+df$ID <- as.numeric(df$ID)
+#Select key metadata columns
+metadata  <- metadata  %>% select(Sample_ID, State_or_Province, Stream_Order, MS_Latitude_dec.deg, MS_Longitude_dec.deg, SW_pH, SW_Temp_degC)
+
+#Get just site number
+metadata <- metadata %>% mutate(ID = str_replace(Sample_ID,"S19S_",""))
+metadata$ID <- as.numeric(metadata$ID)
+
+#Replace "Not_Provided" with NA
+na_strings <- c("Not_Provided" )
+metadata <- metadata %>%
+  replace_with_na_all(condition = ~.x %in% na_strings)
+
+#Merge df from thermo model  and metadata 
+total <- merge(df, metadata, by="ID")
+
+#Remove outliers in lambda
+total <-total[!(total$lambda <= -10),]
+
+#Create bins for plotting
+total <- total %>% 
+              mutate(temp_bin = cut(as.numeric(SW_Temp_degC), breaks=12)) %>%                                  mutate(Lat_bin = cut(as.numeric(MS_Latitude_dec.deg), breaks=12))%>%
+              mutate(pH_bin = cut(as.numeric(SW_pH), breaks=8)) %>%
+              mutate(prxyrt_bin = cut(as.numeric(proxy_rate), breaks=3))
+```
+#Violin plots 
+
+##Violin plots for delGd
+```{r violin_delGd}
+# Basic violin plot
+ggplot(total, aes(x=Lat_bin, y=delGd, fill= Lat_bin)) + 
+  geom_violin() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggplot(na.omit(total), aes(x=temp_bin, y=delGd, fill= temp_bin)) + 
+  geom_violin() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggplot(na.omit(total), aes(x=pH_bin, y=delGd, fill= pH_bin)) + 
+  geom_violin() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggplot(na.omit(total), aes(x=Stream_Order, y=delGd, fill= Stream_Order)) + 
+  geom_violin() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+##Violin plots for delGcat
+```{r violin_delGcat}
+# Basic violin plot
+ggplot(total, aes(x=Lat_bin, y=delGcat, fill= Lat_bin)) + 
+  geom_violin() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggplot(na.omit(total), aes(x=temp_bin, y=delGcat, fill= temp_bin)) + 
+  geom_violin() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggplot(na.omit(total), aes(x=pH_bin, y=delGcat, fill= pH_bin)) + 
+  geom_violin() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggplot(na.omit(total), aes(x=Stream_Order, y=delGcat, fill= Stream_Order)) + 
+  geom_violin() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+##Violin plots for lambda
+```{r violin_lambda}
+# Basic violin plot
+ggplot(total, aes(x=Lat_bin, y=lambda, fill= Lat_bin)) + 
+  geom_violin() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggplot(na.omit(total), aes(x=temp_bin, y=lambda, fill= temp_bin)) + 
+  geom_violin() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggplot(na.omit(total), aes(x=pH_bin, y=lambda, fill= pH_bin)) + 
+  geom_violin() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggplot(na.omit(total), aes(x=Stream_Order, y=lambda, fill= Stream_Order)) + 
+  geom_violin() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+##Violin plots for proxy rate
+```{r violin_proxy_rate}
+# Basic violin plot
+ggplot(total, aes(x=Lat_bin, y=proxy_rate, fill= Lat_bin)) + 
+  geom_violin() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggplot(na.omit(total), aes(x=temp_bin, y=proxy_rate, fill= temp_bin)) + 
+  geom_violin() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggplot(na.omit(total), aes(x=pH_bin, y=proxy_rate, fill= pH_bin)) + 
+  geom_violin() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggplot(na.omit(total), aes(x=Stream_Order, y=proxy_rate, fill= Stream_Order)) + 
+  geom_violin() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+

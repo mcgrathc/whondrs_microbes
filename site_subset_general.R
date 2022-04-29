@@ -43,8 +43,6 @@ df <- rf %>% mutate(ID = strsplit(Site_ID, "_")[[1]][2]) %>%
   #Create column for up, mid and downstream postion
   grepl(pattern = "ICR.U", x = Site_ID) ~ "Up",
   grepl(pattern = "ICR.M", x = Site_ID) ~ "Mid",
-  grepl(pattern = "ICR.U", x = Site_ID) ~ "Up",
-  grepl(pattern = "ICR.M", x = Site_ID) ~ "Mid",
   grepl(pattern = "ICR.D", x = Site_ID) ~ "Down",
   grepl(pattern = "ICR.1", x = Site_ID) ~ "Up",
   grepl(pattern = "ICR.2", x = Site_ID) ~ "Mid",
@@ -54,7 +52,11 @@ df <- rf %>% mutate(ID = strsplit(Site_ID, "_")[[1]][2]) %>%
 #Extract the sample type (water or sediment)
 df$Type <- ifelse(grepl("Sed", df$Site_ID), "Sediment", "Water")
 
+sed_df <- filter(df, Type == "Sediment")
+water_df <- filter(df, Type == "Water")
+
 #Write df to csv file
-write.csv(df,file = "S19S_mol_form_data_with_metadata.csv")
+write.csv(sed_df,file = "S19S_sed_with_metadata.csv")
+write.csv(water_df,file = "S19S_water_with_metadata.csv")
 
 
